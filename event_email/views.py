@@ -5,7 +5,7 @@ from .models import EmpEvent
 from .models import EmployeeEmail
 # Create your views here.
 import pandas as pd
-
+from datetime import date
 
 def home(request):
     return HttpResponse("Hello World")
@@ -70,4 +70,19 @@ def load_data(request):
     except Exception as ex:
         print("Caught in exception")
         print(ex)
+    find_events()
     return HttpResponse('DATA IS IN DB NOW')
+
+def prepare_mail(emp_email, event, event_template):
+    print(emp_email, event, event_template)
+
+
+def find_events():
+    today = date.today()
+    day, month = today.day, today.month
+    emp_event = EmpEvent.objects.filter(date__month=month, date__day=day).values()
+    for i in emp_event:
+        emp_email = EmployeeEmail.objects.filter(employee_id=i['employee_id']).values()
+        event = Event.objects.filter(event_id=i['event_id']).values()
+        prepare_mail(emp_email[0]['email_id'], event[0]['event_type'], event[0]['event_template'])
+
