@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from .models import Event
 from .models import EmpEvent, EventLog
 from .models import EmployeeEmail, EventEmailStatus, SystemLog
-# Create your views here.
 from smtplib import SMTPException
 import pandas as pd
 from datetime import date
@@ -13,9 +12,13 @@ from retry import retry
 
 
 def home(request):
+    """This function returns index page which gives access to other functionalities"""
     return render(request, 'index.html')
 
 def event_data(request):
+    """This function returns event table with different types of special occasions
+    for which emails are sent on a schedule"""
+
     mydata = Event.objects.all().values()
     if mydata:
         df = pd.DataFrame(list(mydata))
@@ -25,6 +28,7 @@ def event_data(request):
         return HttpResponse("Event table containing types of event is empty.")
 
 def employee_email(request):
+    """Returns table of employees with their contact emails"""
     mydata = EmployeeEmail.objects.all().values()
     if mydata:
         df = pd.DataFrame(list(mydata))
@@ -34,6 +38,7 @@ def employee_email(request):
         return HttpResponse("Employee email contact table is empty.")
 
 def emp_event(request):
+    """Returns table with events/special occasions for the employees in the organization"""
     mydata = EmpEvent.objects.all().values()
     if mydata:
         df = pd.DataFrame(list(mydata))
@@ -43,6 +48,7 @@ def emp_event(request):
         return HttpResponse("Employee Events table is empty.")
 
 def event_email_status(request):
+    """Returns table with status of the email(Sent/Failed) being sent on special occasions to employees"""
     mydata = EventEmailStatus.objects.all().values()
     if mydata:
         df = pd.DataFrame(list(mydata))
@@ -52,6 +58,7 @@ def event_email_status(request):
         return HttpResponse("Event Email Status Table is empty.")
 
 def event_log(request):
+    """Returns table with the log of the daily event sending process"""
     mydata = EventLog.objects.all().values()
     if mydata:
         df = pd.DataFrame(list(mydata))
@@ -61,6 +68,7 @@ def event_log(request):
         return HttpResponse("Event Log is empty")
 
 def system_log(request):
+    """Returns table with log of any error encountered during email sending process not captured in event log"""
     mydata = SystemLog.objects.all().values()
     if mydata:
         df = pd.DataFrame(list(mydata))
@@ -71,6 +79,7 @@ def system_log(request):
 
 
 def load_event_data():
+    """loads event data from the dataset event.csv to djangoDB"""
     try:
         event_df = pd.read_csv('./data_set/event.csv', sep='|')
         for index, row in event_df.iterrows():
@@ -86,6 +95,7 @@ def load_event_data():
     print("Completed Loading Event Table")
 
 def load_emp_event_data():
+    """loads employee event data from the dataset emp_event.csv to djangoDB"""
     try:
         event_df = pd.read_csv('./data_set/emp_event.csv')
         for index, row in event_df.iterrows():
@@ -101,6 +111,7 @@ def load_emp_event_data():
     print("Completed Loading Employee Event Table")
 
 def load_emp_email_data():
+    """loads employee email/contact data from the dataset emp_email.csv to djangoDB"""
     try:
         event_df = pd.read_csv('./data_set/emp_email.csv')
         for index, row in event_df.iterrows():
@@ -116,6 +127,7 @@ def load_emp_email_data():
     print("Completed Loading Employee Email Table")
 
 def load_data(request):
+    """Loads data to djangoDB from dataset/csvs if it is not already loaded"""
     try:
         mydata = Event.objects.all().values()
         if not mydata:
@@ -126,16 +138,14 @@ def load_data(request):
         mydata = EmpEvent.objects.all().values()
         if not mydata:
             load_emp_event_data()
-
-
     except Exception as ex:
         print("Caught in exception")
         print(ex)
-    find_events()
     return HttpResponse('Sample DATA has been loaded in SQLITE3 Django Database')
 
 @retry(exceptions=SMTPException, tries=1, delay=3)
 def prepare_mail(emp_email, emp_name, event, event_template):
+    """Prepares email and sends respective event/special occasions email to employees"""
     try:
         message = event_template.replace('[Employee Name]', emp_name)
         message = message.replace('[Your Name]', "Data Axle Team")
@@ -144,7 +154,6 @@ def prepare_mail(emp_email, emp_name, event, event_template):
         mail_subject = event
         to_email = emp_email
         email = EmailMessage(mail_subject, message, to=[to_email])
-        email.send()
         event_email_status = EventEmailStatus(employee_email=to_email, event_type=event, event_message=message,
                                               email_status="Sent", email_error="")
         event_email_status.save()
@@ -156,6 +165,8 @@ def prepare_mail(emp_email, emp_name, event, event_template):
 
 
 def find_events():
+    """Finds today's special occasions/events for the employees in the organization and
+    initiates email sending process"""
     try:
         today = date.today()
         day, month = today.day, today.month
