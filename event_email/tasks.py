@@ -14,4 +14,6 @@ def demo_func(self):
 
 @app.task
 def event_email_processor():
+    """At the scheduled crontab this function is executed which calls
+    find_event() from event_mail/views.py which then initiates event email sending process"""
     find_events()

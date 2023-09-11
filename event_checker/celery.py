@@ -15,10 +15,11 @@ app.conf.update(timezone = 'Asia/Kolkata')
 app.config_from_object(settings, namespace = 'CELERY')
 
 #  Celery beat Settings
+"""This setting schedules celery worker to go live(event_email_processor) at a given crontab"""
 app.conf.beat_schedule = {
     "send-mail-every-day-at-8":{
         'task': 'event_email.tasks.event_email_processor',
-        'schedule': crontab(hour=10, minute=42),
+        'schedule': crontab(hour=0, minute=1),
     }
 }
 app.autodiscover_tasks()
