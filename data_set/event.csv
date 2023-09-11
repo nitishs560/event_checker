@@ -1,5 +1,4 @@
-event_id,event_type,event_template
-1,birthday
-2,work anniversary
-3,wedding anniversary
-4,christmas
+event_id|event_type|event_template
+1|Happy Birthday|Dear [Employee Name],\n\nOn behalf of the entire team at [Company Name], I wanted to take a moment to wish you a very happy birthday!\n\nWe appreciate all the hard work and dedication you bring to the team, and we're grateful to have you as a part of our organization. We hope your birthday is filled with joy and celebration.\n\nWe look forward to celebrating many more birthdays with you in the years to come.\n\nSincerely,\n[Your Name]
+2|Work Anniversary|Dear [Employee Name],\n\nCongratulations on your work anniversary!\n\nYour hard work, dedication, and positive attitude are an inspiration to us all. We're so lucky to have you on our team.\n\nWe're looking forward to many more years of working with you.\n\nSincerely,\n[Your Name]
+3|Merry Christmas|Dear [Employee Name],\n\nOn behalf of the entire team at [Company Name], I wanted to wish you a very Merry Christmas!\n\nWe hope you have a wonderful holiday season filled with joy, peace, and love.\n\nWe're so grateful for your hard work and dedication this year. You've made a big difference in our company, and we couldn't do it without you.\n\nWe're looking forward to a happy and prosperous new year with you.\n\nMerry Christmas!\n\nSincerely,\n[Your Name]
